@@ -1,12 +1,9 @@
 django-blog
 ├── README.md
-├── .gitignore
+└───.gitignore
 
 myvenv
 db.sqlite3
 .vscode
 __pycache__
 *.pyc
-
-$ code -h
-
