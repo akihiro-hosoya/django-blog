@@ -7,3 +7,6 @@ db.sqlite3
 .vscode
 __pycache__
 *.pyc
+
+$ python3 -m venv myvenv
+
