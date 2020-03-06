@@ -1,6 +1,9 @@
 django-blog
 ├── README.md
-└───.gitignore
+├── .gitignore
+├── myvenv
+│   └── ...
+└───requirements.txt
 
 myvenv
 db.sqlite3
