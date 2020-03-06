@@ -1,0 +1,9 @@
+django-blog
+├── README.md
+└───.gitignore
+
+myvenv
+db.sqlite3
+.vscode
+__pycache__
+*.pyc
