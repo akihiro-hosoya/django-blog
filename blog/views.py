@@ -57,6 +57,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from blog.models import Post
 from django.views.generic import (ListView)
+from django.views.generic import (ListView, DetailView)
 
 class PostListView(ListView):
     model = Post
@@ -65,6 +66,31 @@ class PostListView(ListView):
     def get_queryset(self):
         return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     # filter関数を使用して、公開順に投稿を並べるように指定
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "blog/post_detail.html"
+
+
+
+from blog.forms import PostForm
+from django.views.generic import (ListView, DetailView, CreateView)
+
+class CreatePostView(CreateView):
+    template_name = 'blog/post_form.html'
+    redirect_field_name = 'blog/post_detail.html'
+    form_class = PostForm
+    model = Post
+
+
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
+
+class PostUpdateView(UpdateView):
+  template_name = "blog/post_form.html"
+  redirect_field_name = 'blog/post_detail.html'
+  form_class = PostForm
+  model = Post
+
 
 
 

@@ -1,0 +1,17 @@
+{% extends 'blog/base.html' %}
+
+{% block header %}
+<div class="post-heading">
+  <h1>{{ post.title }}</h1>
+  {% if post.published_date %}
+    <span class="meta">{{ post.published_date }}</span>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<a class="btn btn-success" href="{% url 'post_edit' pk=post.pk %}" role="button">Edit</a>
+<p>
+  {{ post.text|linebreaksbr }}
+</p>
+{% endblock %}
