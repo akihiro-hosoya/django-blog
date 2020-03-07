@@ -62,6 +62,10 @@ class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
 
+    def get_queryset(self):
+        return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    # filter関数を使用して、公開順に投稿を並べるように指定
+
 
 
 '''
@@ -74,6 +78,3 @@ class PostListView(ListView):
 
 「クエリセット」＝クエリの実行結果
 '''
-    def get_queryset(self):
-        return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
-    # filter関数を使用して、公開順に投稿を並べるように指定
