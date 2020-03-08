@@ -58,6 +58,14 @@ from django.utils import timezone
 from blog.models import Post
 from django.views.generic import (ListView)
 from django.views.generic import (ListView, DetailView)
+from blog.forms import PostForm
+from django.views.generic import (ListView, DetailView, CreateView)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
+
 
 class PostListView(ListView):
     model = Post
@@ -73,10 +81,6 @@ class PostDetailView(DetailView):
 
 
 
-from blog.forms import PostForm
-from django.views.generic import (ListView, DetailView, CreateView)
-
-from django.contrib.auth.decorators import login_required
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     template_name = 'blog/post_form.html'
@@ -85,7 +89,6 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
 
 
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
@@ -103,7 +106,7 @@ class DraftListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Post.objects.filter(published_date__isnull=True).order_by('created_date')
 
-from django.shortcuts import render, redirect, get_object_or_404
+
 
 @login_required
 def post_publish(request, pk):
@@ -111,9 +114,6 @@ def post_publish(request, pk):
     post.publish()
     return redirect('post_detail', pk=pk)
 
-
-from django.urls import reverse_lazy
-from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 class PostDeleteView(DeleteView):
