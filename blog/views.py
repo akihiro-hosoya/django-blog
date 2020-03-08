@@ -58,7 +58,6 @@ from django.utils import timezone
 from blog.models import Post
 from django.views.generic import (ListView)
 from django.views.generic import (ListView, DetailView)
-from django.contrib.auth.decorators import login_required
 
 class PostListView(ListView):
     model = Post
@@ -77,6 +76,7 @@ class PostDetailView(DetailView):
 from blog.forms import PostForm
 from django.views.generic import (ListView, DetailView, CreateView)
 
+from django.contrib.auth.decorators import login_required
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     template_name = 'blog/post_form.html'
