@@ -20,4 +20,23 @@
 <p>
   {{ post.text|linebreaksbr }}
 </p>
+
+<hr>
+<p>
+  <a class="btn btn-success" href="{% url 'post_comment' pk=post.pk %}" role="button">Add comment</a>
+</p>
+{% for comment in post.comments.all %}
+  {% if not comment.approved_comment %}
+  <p>
+    <a class="btn btn-danger" href="{% url 'comment_remove' pk=comment.pk %}" role="button">Remove</a>
+    <a class="btn btn-primary" href="{% url 'comment_approve' pk=comment.pk %}" role="button">Approve</a>
+  </p>
+  {% endif %}
+  <p class="comment-meta">{{ comment.created_date }}</p>
+  <strong>{{ comment.author }}</strong>
+  <p>{{ comment.text|linebreakers }}</p>
+{% empty %}
+  <p>まだコメントがありません</p>
+{% endfor %}
+
 {% endblock %}
