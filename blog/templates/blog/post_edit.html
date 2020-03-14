@@ -1,0 +1,9 @@
+{% block content %}
+    <form method="POST" class="post-form" enctype="multipart/form-data" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-right">
+            <button type="submit" class="save btn btn-cuccess" role="button">Save</button>
+        </div>
+    </form>
+{% endblock %}

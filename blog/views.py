@@ -67,12 +67,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 from blog.forms import PostForm, CommentForm
-
+from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
+    pagemate_by = 3
 
     def get_queryset(self):
         return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
@@ -149,6 +150,10 @@ def comment_remove(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     comment.delete()
     return redirect('post_detail', pk=comment.post.pk)
+
+class AboutView(TemplateView):
+    template_name = 'page/about.html'
+
 
 '''
 動的に変わるデータはViewで処理する

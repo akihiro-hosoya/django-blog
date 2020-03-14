@@ -1,5 +1,12 @@
 {% extends 'blog/base.html' %}
 
+{% if post.image %}
+<style>
+  header.masthead {
+    background-image: url('/{{ post.image.url }}') !important;
+  }
+</style>
+
 {% block header %}
 <div class="post-heading">
   <h1>{{ post.title }}</h1>
