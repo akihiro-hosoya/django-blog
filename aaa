@@ -1,0 +1,137 @@
+・仮想環境
+プロジェクト単位であなたのPython/Djangoのセットアップを他から隔離
+ウェブサイトに行ったどんな変化も他のサイトに影響を及ぼさない
+作成するのは、ホームディレクトリにする
+myvenvを起動：$ sourse myvenv/bin/activate ⇆ deactivate
+
+・requirements.txt
+ルートディレクトリに作成。
+Djangoをインストール
+
+・manage.py
+サイトの管理に役立つスクリプト
+サーバーの実行：$ python3 manage.py runserver
+http://127.0.0.1:8000/
+
+・mysite/setting.py
+ウェブサイトの設定
+    タイムゾーンを東京に
+    言語コードを設定
+    静的ファイルのパスを追加（CSSなど）
+    DBをセットアップ（sqlite3：Django初期搭載）
+    アプリケーションを追加[INSTALLED_APPS]
+
+・mysite/urls.py
+urlresolverで使用されるパターンのリストを含む
+
+
+
+○Djangoモデル
+退屈なプログラムを繰り返し書く代わりにモデルになるものを作って、それが他とどう作用するかを定義するという考え方
+・オブジェクト
+    プロパティ：状態
+    アクション：命令
+    例：モデル＝猫
+        オブジェクト：猫
+        プロパティ：色、年齢、期限、飼い主（人オブジェクト）
+        アクション：喉を鳴らす、引っ掻く、餌を食べる
+        Cat
+        --------
+        color
+        age
+        mood
+        owner
+        purr()
+        scratch()
+        feed(cat_food)
+・models.py
+ex.)
+    from django.xxx import xxx
+
+    class オブジェクト名（継承元）:   # モデルを定義 # models.ModelはポストがDjango Modelだという意味で、Djangoが、これはデータベースに保存すべきものだと分かるようにしている
+        プロパティ
+        例：author = models.ForeignKey(...)
+
+        def アクション（self）: # メソッドは通常何かをreturn
+            命令
+・モデルを変更したら、データベース更新
+データベースにモデルのためのテーブルを作成
+(myvenv) ~$ pthon3 manage.py makemigrations xxx(ルートディレクトリ)
+(myvenv) ~$ python3 manage.py migrate blog
+
+
+
+○管理画面  admin.py
+Djangoのメリットの一つで、自動的に生成されるadminインタフェース。
+from django.contrib import admin # admin定義
+
+ex.)
+admin.site.xxx(xxx)
+
+サーバー実行するとログイン画面が出てくる
+(myvenv) ~$ python manage.py createsuperuser (コマンドライン)
+Username: xxx
+Email address: xxx@example.com
+Password:
+Password (again):
+Superuser created successfully.
+
+
+
+○環境
+・ローカル
+・仮想環境
+・デプロイ
+
+
+
+○Django URL   urls.py
+URL = Web上のアドレス
+mysite/urls.pyに予め設定されている？
+
+ex.)
+from django.contrib import admin
+from django.urls import path, include  # 追加
+
+urlpatterns = [
+    path('admin/', admin.site.urls),  # admin/ で始まる全てのURLについて、Djangoが返すべきビューをこの行で指定
+    path('', include('blog.urls')),  # 追加  # これでDjangoは'http://127.0.0.1:8000/' に来たリクエストは blog.urls へリダイレクトするようになる
+]
+
+    ●xxxディレクトリのURL
+    from django.urls import path   # Djangoの path関数と
+    from . import views   # xxxアプリの全てのViewをimport
+    # URLパターンを追加
+    urlpatterns = [
+        path(''（http://127.0.0.1:8000/ のこと）, views.post_list, name='post_list'), # ここでは、post_list という名前の ビュー をルートURLに割り当てている
+    ]
+    # このパターンは誰かがあなたのWebサイトの 'http://127.0.0.1:8000/' というアドレスにアクセスしてきたら views.post_list が正しい行き先だということをDjangoに伝える
+    # 最後の name='post_list' は、ビューを識別するために使われるURL の名前
+    ↓↓↓↓↓
+    # このままだと、Viewにpost_listがDjangoが探してもないので、「'post_list' という属性(attribute)がない」とエラーが出る
+
+
+
+○Django VIEW    views.py
+Viewはアプリのロジックを書いていく。
+Viewは、以前あなたが作ったmodelに情報を要求し、それをTemplateに渡す。
+Viewは、ただのPythonの関数。
+
+ex.) blog/view.py
+from django.shortcuts import render
+
+# Create your views here. ここからViewを書いていく
+def post_list(request):
+    return render(request, 'blog/post_list.html', {})
+    # post_listという関数を作成
+    # これは request を引数に取る
+    # blog/post_list.html テンプレートを（色々なものを合わせて）組み立てる render という関数を呼び出して得た値を return
+    ↓↓↓↓↓
+    # このままだと、Templateにpost_listをDjangoが探してもないので、「'post_list' というTemplateがない」とTemplateDoesNotExistエラーが出る
+
+
+
+○Template   xxx.html
+
+Templateは中にもう一つディレクトリを作成する
+理由は、もっと複雑なことをやろうとした時に、それが楽にできるようにしてくれる便利な命名法らしい
