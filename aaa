@@ -135,3 +135,196 @@ def post_list(request):
 
 Templateは中にもう一つディレクトリを作成する
 理由は、もっと複雑なことをやろうとした時に、それが楽にできるようにしてくれる便利な命名法らしい
+
+ここまで作成すれば、エラーは出ない。
+    ・head
+        文書についての情報を含む要素で、画面には表示されない
+    ・body
+        Webページの一部として表示されるすべてを含む要素
+
+次にやるべきは、Templateを使って他のページを複製して拡張
+
+
+
+○クエリセット QuerySet
+クエリセット　＝　モデルのオブジェクトのリストのこと
+クエリセットを使って、データベースからデータを読み込んだり、抽出したり、並べ替えたりできる。
+
+    ・データの表示・確認方法
+    全てのオブジェクトを表示させるには、
+    Django shellでコマンド入力を可能にする。　⇆　終了時は、>>> exit() を出力
+    コマンドで、対象のモジュールをimportしてから、
+    >>> xxx.object.all()   を実行する。
+    ex.)Post
+        >>> from blog.models import Post
+        >>> Post.object.all()
+        <QuerySet [<Post: my post title>, <Post: another post title>]>
+        # modelで{}の中に引数を記述する時は、{'名前': 値（クエリセット）}とする。
+
+    ・オブジェクトの作成
+    ・オブジェクトの抽出
+    ・オブジェクトの並べ替え
+    ・メソッドチェーンによる複雑なクエリ
+
+
+
+○テンプレート内の動的データ
+ポスト内容を保存する為の Post モデルは、 models.py に定義
+ポストの一覧を表示する post_list は views.py に
+そこにテンプレートも加わった
+↓↓↓↓↓
+実際のところ、ポストをどうやってHTMLファイルに出力すればいいのか？
+↓↓↓↓↓
+データベースに保存された記事を取り出して、
+テンプレートのHTMLファイルの中に行儀よく並べれば良さそう
+
+## Viewは、modelとTemplateの橋渡しをしている
+# 表示したいデータを取り出して、テンプレートファイルに渡す。
+# どのモデルのデータを、どのTemplateに表示させるかを、 Viewに 記述する。
+
+
+
+○Django Templateについて
+    ・Djangoテンプレートタグ
+        HTML中で本当はPythonのコードを書くことはできない # HTMLはどちらかというと静的で、それに対してPythonはもっとずっと動的だから
+        Djangoテンプレートタグ はHTMLにPyhtonのようなコードを埋め込むことができる
+    
+    ・ブログ一覧テンプレートの表示
+        変数を表示　：　{{ xxx }}  →　modelの命令が表示され、Djangoはxxx変数をオブジェクトのリストと認識
+        ループ等を使ってリストをなどを表示できる
+        ex.)
+            {% for post in posts %}
+                {{ post }}
+            {% endfor %}
+            ↓↓↓↓↓
+            # HYMLと混ぜると...
+            {% for post in posts %}
+                <div>
+                    <p>published: {{ post.published_date }}</p>
+                    <h2><a href="">{{ post.title }}</a></h2>
+                    <p>{{ post.text|linebreaksbr }}</p>
+                </div>
+            {% endfor %}
+    
+    ・テンプレートの拡張
+    base.html : 基本テンプレートを作成して、継承していく。
+    xxx.html : 基本と異なる部分だけbaseから拡張する
+
+        ・Djangoの文をまとめて挿入するには
+            {% extends 'blog/base.html' %}   # 継承
+            {% block content %}
+                ex.)
+                    {% for post in posts %}
+                        <div class="post">
+                            <div class="date">
+                                {{ post.published_date }}
+                            </div>
+                            <h2><a href="">{{ post.title }}</a></h2>
+                            <p>{{ post.text|linebreaksbr }}</p>
+                        </div>
+                    {% endfor %}
+            {% endblock %}
+
+
+
+○Djangoの静的ファイル
+
+静的ファイル　＝　CSSファイルや画像ファイルといった、動的な変更が発生しないファイルのこと
+# これらのファイルはリクエストに依存せず、どのユーザに対しても中身は同じ
+
+    ・配置はtemplateと同じディレクトリで、その中にstaticフォルダを作成
+    ・staticにcssやimagesなどのフォルダを作成し、ファイルを作成
+    ・HTMLテンプレートには
+        {% load static %}を挿入
+
+
+
+○アプリケーションの拡張
+
+    ex.) post_detailを追加
+
+        1.htmlファイルにリンクを追加
+            <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+            # 'post_detail' はDjangoが blog/urls.py に書かれた name=post_detail のURLにつなげることを表す
+            # pk = post.pk は （pkはプライマリキーの略）データベースの各レコードのユニークな名前
+                デフォルトでは、各記事ごとに1ずつ増える数字で、たとえば1、2、3
+
+
+        2.URLを作成
+            post_detail View用にurls.pyにURLを作成
+            path('post/<int:pk>/', views.post_detail, name='post_detail'),
+
+                # post/<int:pk>/
+                    Djangoは整数の値を期待し、その値がpkという名前の変数でビューに渡されることを意味
+                    ex.) post/2/
+                
+                # views.post_detail / name='post_detail'
+
+
+        3.投稿の詳細Viewを追加
+            Post.objects.get(pk=pk)
+
+                # 今回はViewに追加のパラメータpkが与えられます。 私たちのViewはそれを受け取る必要がある
+                # そこで関数をdef post_detail(request, pk):として定義
+                # urlsで指定した名前（pk）とまったく同じ名前を使用する必要があることに注意
+                ↓↓↓↓↓
+                # しかし、このコードには問題がある。
+                    与えられたプライマリキー（pk）を持つPostが存在しない場合、とてもダサいエラーが発生
+                # しかし幸運にもDjangoにはそれを処理するものがある
+                    get_object_or_404
+                    from django.shortcuts import render, get_object_or_404
+                
+            def post_detail(request, pk):
+                post = get_object_or_404(Post, pk=pk)
+                return render(request, 'blog/post_detail.html', {'post': post})
+
+
+        4.post_detailへのテンプレートリンクを作成
+            ・blog/templates/blogにpost_detail.htmlというファイルを作成
+
+            {% extends 'blog/base.html' %}
+
+            {% block content %}
+                <div class="post">
+                    {% if post.published_date %}
+                        <div class="date">
+                            {{ post.published_date }}
+                        </div>
+                    {% endif %}
+                    <h2>{{ post.title }}</h2>
+                    <p>{{ post.text|linebreaksbr }}</p>
+                </div>
+            {% endblock %}
+
+            # {% if ... %} ... {％endif％}は、何かをチェックしたいときに使用できるテンプレートタグ
+
+
+
+○Djangoフォーム   forms.py
+私たちのWebサイトで最終的にやりたいことは、記事を追加したり編集したりするためのよい方法を作ること
+# Django adminもあるが、カスタマイズが困難。
+
+    ・Django formのよいところは、
+        formをゼロから定義できたり、
+        formの結果をmodelに保存できる ModelForm を作れたりするところ
+    
+    ex.) blog/forms.py
+
+        from django import forms
+        from .models import Post
+
+        class PostForm(forms.ModelForm):
+
+            class Meta:
+                model = Post
+                fields = ('title', 'text',)
+        
+        # 最初にDjangoのforms、Postモデルをインポート
+        # フォームの名前：PostForm (ModelFormの一種)
+        # フォームを作るときにどのモデルを使えばいいか : 
+            class Meta でDjangoに伝える
+        # フォームのフィールドに何を置くか : 
+            ここでは、私たちはtitle（タイトル）と text（本文）のみをフォームで使用
+            author は現在ログインしている人（あなた）
+            created_date は（コードによって）自動的に記事を書いた日時を設定
+
