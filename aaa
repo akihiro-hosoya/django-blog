@@ -328,3 +328,83 @@ Templateは中にもう一つディレクトリを作成する
             author は現在ログインしている人（あなた）
             created_date は（コードによって）自動的に記事を書いた日時を設定
 
+    1.formにおけるページへのリンク
+        base.htmlに
+            <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus">xxx</span></a>
+            # 新しいView post_newを呼び出すことに注意
+
+    2.URLを作成
+        urls.pyに
+            path('post/new/', views.post_new, name='post_new'),
+            # post_new Viewを呼び出す。
+    
+    3.post_new View
+        views.pyに
+            from .forms import PostForm
+            def post_new(request):
+                form = PostForm()
+                return render(request, 'blog/post_edit.html', {'form': form})
+
+    4.Template
+        post_edit.html ファイルを作成し、
+        {% extends 'blog/base.html' %}
+
+        {% block content %}
+            <h2>New post</h2>
+            <form method="POST" class="post-form">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Save</button>
+            </form>
+        {% endblock %}
+        
+        ・formを表示
+            {{ form.as_p }} で
+        ・<form method="POST">...</form>でwrap
+        ・Saveボタンの設置
+            <button type="submit">Save</button>
+        ・<form ...> タグの開始直後に、 {% csrf_token %}を追加する
+            # formをセキュアにするために重要
+        ↓↓↓↓↓
+        何か入力して保存すると、何も起きません！
+        もう一度同じページに戻りテキストはどこかに行ってしまう
+        ビュー でもう少し作業を行う必要あり
+
+    5.formを保存
+        views.pyのpost_new viewをみると、フォームを送信したとき、同じビューに戻されている。
+        この時、request（request.POST）にデータが追加されている。
+
+            # 私たちのViewでは、扱わなくてはならない２つの別々のシチュエーションがある。
+                ⑴最初にページにアクセスしてきた時で空白のformが必要な場合
+                ⑵すべてのフォームデータが入力された状態でViewに戻ってくる場合
+                    # 条件分岐を追加する必要がある  if
+                from django.shortcuts import redirect
+
+                def post_new(request):    
+                    if request.method == "POST":            # → ⑵
+                        form = PostForm(request.POST)       # methodがPOSTの場合、formのデータを使ってPostFormを構築
+                        if form.is_valid():                 # フォームの値が正しいかどうかをチェック
+                            post = form.save(commit=False)  # 最初は保存はしないからFalse
+                            post.author = request.user      # authorを追加
+                            post.published_date = timezone.now()
+                            post.save()                     # OKなら保存される
+                            return redirect('post_detail', pk=post.pk)
+                            # post_detailは移動したいViewの名前
+                            # このviewでは、pk変数が必須
+                    else:                                   # → ⑴
+                        form = PostForm()
+                    return render(request, 'blog/post_edit.html', {'form': form})
+
+    6.formの検証
+        入力されていない項目があると、Djangoが自動的に判別
+
+    7.formの編集
+        ここまでで、追加はできる。
+        既存のデータを編集するためには？
+
+        ..................
+
+    8.セキュリティ
+        HTMLに
+        {% if user.is_authenticated %}
+        ...
+        {% endif %}
