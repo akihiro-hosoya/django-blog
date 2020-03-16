@@ -1,5 +1,5 @@
 {% block content %}
-    <form method="POST" class="post-form" enctype="multipart/form-data" action="">
+    <form method="POST" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="text-right">
