@@ -55,7 +55,7 @@ from django.shortcuts import render
 '''
 
 from django.utils import timezone
-from blog.models import Post, Comment
+from blog.models import Post, Comment, Category
 from django.views.generic import (ListView)
 from django.views.generic import (ListView, DetailView)
 from blog.forms import PostForm
@@ -68,6 +68,20 @@ from django.urls import reverse_lazy
 from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 from blog.forms import PostForm, CommentForm
 from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
+
+class CategoryView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+
+    def get_queryset(self):
+        category = Category.objects.get(name=self.kwargs['category'])
+        queryset = Post.objects.order_by('-id').filter(category=category)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category_key'] = self.kwargs['category']
+        return context
 
 
 class PostListView(ListView):
