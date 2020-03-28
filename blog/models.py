@@ -9,6 +9,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to='images', blank=True, null=True)
     title = models.CharField(max_length=200)
     text = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.PROJECT)
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
 
@@ -44,3 +45,9 @@ class Comment(models.Model):
     
     def __str__(self):
         return self.text
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
