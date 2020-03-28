@@ -398,3 +398,15 @@ footer .copyright {
     background-color: #0085A1 !important;
     border: solid 1px #0085A1 !important;
 }
+
+.category ul, ol {
+    background: #fcfcfc;
+    border-radius :3px;
+    border: solid 1px gray;
+    padding: 0.5em 0.5em 0.5em 2em;
+}
+
+.category ul li, ol li {
+    line-height: 1.5;
+    padding: 0.5em 0;
+}
