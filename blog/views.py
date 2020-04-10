@@ -56,16 +56,10 @@ from django.shortcuts import render
 
 from django.utils import timezone
 from blog.models import Post, Comment, Category
-from django.views.generic import (ListView)
-from django.views.generic import (ListView, DetailView)
-from blog.forms import PostForm
-from django.views.generic import (ListView, DetailView, CreateView)
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 from blog.forms import PostForm, CommentForm
 from django.views.generic import (TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 
@@ -97,16 +91,12 @@ class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
 
-
-
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     template_name = 'blog/post_form.html'
     redirect_field_name = 'blog/post_detail.html'
     form_class = PostForm
     model = Post
-
-
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'

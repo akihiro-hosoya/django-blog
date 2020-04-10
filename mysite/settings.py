@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog.apps.BlogConfig', # 追加
+    'blog.apps.BlogConfig',
     'accounts.apps.AccountsConfig',
     'django.contrib.sites',
     'allauth',
@@ -145,3 +146,5 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 # EMAIL_HOST_USER = 'gmail adress'
 # EMAIL_HOST_PASSWORD = 'gmail password'
 # EMAIL_USE_TLS = True
+
+django_heroku.settings(locals())
