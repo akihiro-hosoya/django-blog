@@ -11,6 +11,7 @@
   <div class="container">
     <div class="row">
       <div class="col-9">
+        <!-- 投稿リスト -->
         {% for post in post_list %}
         <div class="post-preview">
           <a href="{% url 'post_detail' pk=post.pk %}">
@@ -27,6 +28,7 @@
         <hr>
         {% endfor %}
 
+        <!-- ページネーション -->
         <ul class="pagination pagination-sm justify-content-center">
           {% if page_obj.has_previous %}
             <li class="page-item">
